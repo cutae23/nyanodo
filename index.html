@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>냥일정</title>
+</head>
+<body>
+    <h1>냥일정</h1>
+    <div id="todo-list"></div>
+    <button id="ms">추가</button>
+
+    
+    <script>
+        // 1. 데이터 불러오기
+        let todos = JSON.parse(localStorage.getItem('nyanodo_data')) || [];
+
+        // 2. 저장 함수
+        function saveTodos() {
+            localStorage.setItem('nyanodo_data', JSON.stringify(todos));
+        }
+
+        // 3. render 함수 재정의
+        const originalRender = render;
+        render = function() {
+            originalRender();
+            saveTodos();
+        };
+
+        // 4. 초기 실행
+        render();
+    </script>
+
+</body>
+</html>
