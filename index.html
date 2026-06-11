@@ -637,11 +637,11 @@ function saveTodos() {
     localStorage.setItem('nyanodo_todos', JSON.stringify(todos));
 }
 
-// 기존 render 함수 호출 시점에 저장을 연동합니다.
+// Modify the render function to auto-save
 const originalRender = render;
 render = function() {
-    saveTodos();
     originalRender();
+    saveTodos();
 };
 </script>
 </body></html>
