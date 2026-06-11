@@ -1,0 +1,646 @@
+
+<!-- saved from url=(0036)file:///D:/%23%23app/nyanodo_v3.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link href="./nyanodo_v3_files/css2" rel="stylesheet">
+</head><body><h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">냥일정 — 귀여운 고양이 할 일 관리 앱</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body,input,select,textarea,button{font-family:'Nunito',sans-serif}
+:root{
+  --bg:#faf8ff;--card:#fff;--side:#f3f0ff;
+  --p:#7c6fe0;--p2:#5a4fcf;--p3:#ede9ff;
+  --b1:#2d2a3e;--b2:#6b6580;--b3:#a8a3bb;--b4:#d4d0e8;
+  --coral:#f4856a;--amber:#e09030;--teal:#3dba8c;--pink:#d4537e;
+  --r:14px;--rp:999px
+}
+.app{display:grid;grid-template-columns:300px 1fr;min-height:720px;background:var(--bg);border-radius:20px;border:1.5px solid var(--b4);overflow:hidden}
+.left{background:var(--side);border-right:1.5px solid var(--b4);display:flex;flex-direction:column}
+.right{display:flex;flex-direction:column;background:var(--bg)}
+
+/* CAL */
+.cal-hd{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.cal-title{font-size:15px;font-weight:800;color:var(--b1)}
+.cal-nav{display:flex;gap:4px}
+.cnb{width:26px;height:26px;border:1.5px solid var(--b4);border-radius:8px;background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--b2);font-size:14px}
+.cnb:hover{background:var(--p3);border-color:var(--p)}
+.ltog{display:flex;gap:2px;background:var(--b4);border-radius:var(--rp);padding:2px}
+.ltb{padding:2px 9px;font-size:11px;font-weight:700;border:none;background:transparent;color:var(--b3);cursor:pointer;border-radius:var(--rp)}
+.ltb.on{background:var(--card);color:var(--p)}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);padding:0 12px}
+.dow span{text-align:center;font-size:10px;font-weight:700;color:var(--b3);padding:4px 0}
+.dg{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;padding:0 10px 8px}
+.dc{border-radius:9px;cursor:pointer;padding:3px 2px;display:flex;flex-direction:column;align-items:center;min-height:38px;justify-content:flex-start;padding-top:4px}
+.dc:hover{background:var(--p3)}
+.dc.fade .dn{color:var(--b4)}
+.dn{font-size:12px;font-weight:700;color:var(--b1);line-height:1.3}
+.lun{font-size:9px;color:var(--b3);line-height:1}
+.dc.tod .dn{background:var(--p);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.dc.sel{background:var(--p3)}
+.dc.sel .dn{color:var(--p2)}
+.dc.sun .dn{color:var(--coral)}
+.dc.tod .dn{color:#fff!important}
+.dotrow{display:flex;gap:2px;margin-top:2px}
+.dot{width:4px;height:4px;border-radius:50%}
+
+/* MOOD */
+.mood-area{border-top:1.5px solid var(--b4);padding:10px 14px 10px;background:var(--card)}
+.area-hd{font-size:10px;font-weight:800;color:var(--b3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.mood-scroll{display:flex;gap:6px;flex-wrap:wrap}
+.mb{border:1.5px solid var(--b4);border-radius:12px;background:var(--side);cursor:pointer;padding:5px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;width:50px;transition:all .15s}
+.mb:hover{border-color:var(--p);background:var(--p3)}
+.mb.on{border-color:var(--p);background:var(--p3)}
+.mb svg{width:34px;height:34px}
+.mb-lbl{font-size:9px;font-weight:700;color:var(--b3);text-align:center;line-height:1.2}
+.mb.on .mb-lbl{color:var(--p2)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 14px 6px}
+.st{background:var(--card);border-radius:10px;padding:8px 4px;text-align:center;border:1px solid var(--b4)}
+.sn{font-size:20px;font-weight:800;color:var(--b1)}
+.sl{font-size:9px;font-weight:700;color:var(--b3);text-transform:uppercase;letter-spacing:.05em}
+.prog-w{padding:4px 14px 12px}
+.pb-bg{height:6px;background:var(--b4);border-radius:var(--rp);overflow:hidden}
+.pb-fill{height:100%;background:var(--p);border-radius:var(--rp);transition:width .4s}
+.pb-lbl{font-size:10px;color:var(--b3);font-weight:700;margin-bottom:3px}
+
+/* RIGHT */
+.rp-top{padding:14px 18px 12px;border-bottom:1.5px solid var(--b4);display:flex;align-items:flex-start;justify-content:space-between;background:var(--card)}
+.dh{font-size:17px;font-weight:800;color:var(--b1)}
+.ds{font-size:12px;font-weight:600;color:var(--b3);margin-top:2px}
+.top-r{display:flex;align-items:center;gap:6px}
+.frow{display:flex;gap:4px}
+.fb{padding:3px 10px;font-size:12px;font-weight:700;border:1.5px solid var(--b4);border-radius:var(--rp);background:transparent;color:var(--b3);cursor:pointer}
+.fb.on{background:var(--p3);color:var(--p2);border-color:var(--p)}
+.add-btn{display:flex;align-items:center;gap:5px;padding:6px 14px;background:var(--p);color:#fff;border:none;border-radius:var(--rp);font-size:13px;font-weight:800;cursor:pointer}
+.add-btn:hover{background:var(--p2)}
+
+.list{flex:1;overflow-y:auto;padding:12px 16px}
+.list::-webkit-scrollbar{width:3px}
+.list::-webkit-scrollbar-thumb{background:var(--b4);border-radius:2px}
+.slbl{font-size:10px;font-weight:800;color:var(--b3);letter-spacing:.07em;text-transform:uppercase;margin:12px 0 5px}
+.slbl:first-child{margin-top:0}
+
+/* CARD */
+.tc{display:flex;align-items:stretch;gap:0;background:var(--card);border:1.5px solid var(--b4);border-radius:var(--r);margin-bottom:6px;overflow:hidden;transition:border-color .15s}
+.tc:hover{border-color:var(--p)}
+.tc.donec{opacity:.5}
+.tc-icon{width:52px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:8px 4px}
+.tc-icon svg{width:40px;height:40px}
+.tc-body{flex:1;padding:9px 6px 9px 2px;min-width:0}
+.tc-title{font-size:14px;font-weight:700;color:var(--b1);line-height:1.35}
+.donec .tc-title{text-decoration:line-through;color:var(--b3)}
+.tc-meta{display:flex;align-items:center;gap:4px;margin-top:4px;flex-wrap:wrap}
+.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--rp)}
+.bh{background:#fff0eb;color:#c05030}
+.bm{background:#fff8e5;color:#a06010}
+.bl{background:#edfaf4;color:#1a7a50}
+.br{background:var(--p3);color:var(--p2)}
+.bc{font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--rp)}
+.tc-time{font-size:11px;font-weight:700;color:var(--b3)}
+.tc-r{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;padding:9px 10px 9px 0}
+.chk{width:20px;height:20px;border:2px solid var(--b4);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;background:var(--bg)}
+.chk.on{background:var(--p);border-color:var(--p)}
+.act-row{display:flex;gap:4px}
+.abt{display:flex;align-items:center;gap:3px;padding:3px 8px;border:1.5px solid var(--b4);border-radius:8px;background:var(--side);cursor:pointer;font-size:11px;font-weight:700;color:var(--b2)}
+.abt:hover{border-color:var(--p);background:var(--p3);color:var(--p2)}
+.abt.del:hover{border-color:#f4856a;background:#fff0eb;color:#c05030}
+
+/* MODAL */
+.ov{background:rgba(45,42,62,.4);display:flex;align-items:center;justify-content:center;min-height:480px;padding:16px}
+.modal{background:var(--card);border-radius:20px;padding:22px;width:100%;max-width:410px;border:1.5px solid var(--b4)}
+.mhd{font-size:16px;font-weight:800;color:var(--b1);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.mhd svg{width:22px;height:22px}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:11px;font-weight:800;color:var(--b2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;border:1.5px solid var(--b4);border-radius:10px;padding:8px 11px;background:var(--side);color:var(--b1);outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--p);background:#fff}
+.field textarea{height:52px;resize:none}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cat-pick{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cp{border:1.5px solid var(--b4);border-radius:10px;background:var(--side);cursor:pointer;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.cp svg{width:30px;height:30px}
+.cp.on{border-color:var(--p);background:var(--p3)}
+.cp-lbl{font-size:10px;font-weight:700;color:var(--b3)}
+.cp.on .cp-lbl{color:var(--p2)}
+.repset{display:flex;gap:5px;flex-wrap:wrap}
+.rs{padding:4px 11px;border:1.5px solid var(--b4);border-radius:var(--rp);background:transparent;font-size:12px;font-weight:700;color:var(--b3);cursor:pointer}
+.rs.on{background:var(--p3);color:var(--p2);border-color:var(--p)}
+.mftr{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.btn-c{padding:8px 16px;border:1.5px solid var(--b4);border-radius:var(--rp);background:transparent;font-size:13px;font-weight:700;color:var(--b2);cursor:pointer}
+.btn-s{padding:8px 20px;border:none;border-radius:var(--rp);background:var(--p);color:#fff;font-size:13px;font-weight:800;cursor:pointer}
+.empty{text-align:center;padding:36px 0;color:var(--b3)}
+.empty p{font-size:13px;font-weight:600;margin-top:6px}
+</style>
+
+<div class="app" id="app">
+  <div class="left" id="lpanel">
+    <div class="cal-hd">
+      <div class="cal-nav">
+        <button class="cnb" id="pm">‹</button>
+        <button class="cnb" id="nm">›</button>
+        <span class="cal-title" style="margin-left:4px">2026년 6월</span>
+      </div>
+      <div class="ltog">
+        <button class="ltb on" id="sol">양력</button>
+        <button class="ltb" id="lun">음력</button>
+      </div>
+    </div>
+    <div class="dow"><span style="color:var(--coral)">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:var(--p)">토</span></div>
+    <div class="dg" id="dg"><div class="dc fade sun" data-d="2026-05-31"><div class="dn">31</div></div><div class="dc" data-d="2026-06-01"><div class="dn">1</div></div><div class="dc" data-d="2026-06-02"><div class="dn">2</div></div><div class="dc" data-d="2026-06-03"><div class="dn">3</div></div><div class="dc" data-d="2026-06-04"><div class="dn">4</div></div><div class="dc" data-d="2026-06-05"><div class="dn">5</div></div><div class="dc" data-d="2026-06-06"><div class="dn">6</div></div><div class="dc sun" data-d="2026-06-07"><div class="dn">7</div></div><div class="dc" data-d="2026-06-08"><div class="dn">8</div></div><div class="dc" data-d="2026-06-09"><div class="dn">9</div></div><div class="dc" data-d="2026-06-10"><div class="dn">10</div></div><div class="dc tod" data-d="2026-06-11"><div class="dn">11</div></div><div class="dc" data-d="2026-06-12"><div class="dn">12</div></div><div class="dc" data-d="2026-06-13"><div class="dn">13</div></div><div class="dc sun" data-d="2026-06-14"><div class="dn">14</div></div><div class="dc" data-d="2026-06-15"><div class="dn">15</div></div><div class="dc" data-d="2026-06-16"><div class="dn">16</div></div><div class="dc" data-d="2026-06-17"><div class="dn">17</div></div><div class="dc" data-d="2026-06-18"><div class="dn">18</div></div><div class="dc" data-d="2026-06-19"><div class="dn">19</div></div><div class="dc" data-d="2026-06-20"><div class="dn">20</div></div><div class="dc sun" data-d="2026-06-21"><div class="dn">21</div></div><div class="dc" data-d="2026-06-22"><div class="dn">22</div></div><div class="dc" data-d="2026-06-23"><div class="dn">23</div></div><div class="dc" data-d="2026-06-24"><div class="dn">24</div></div><div class="dc" data-d="2026-06-25"><div class="dn">25</div></div><div class="dc" data-d="2026-06-26"><div class="dn">26</div></div><div class="dc" data-d="2026-06-27"><div class="dn">27</div></div><div class="dc sun" data-d="2026-06-28"><div class="dn">28</div></div><div class="dc" data-d="2026-06-29"><div class="dn">29</div></div><div class="dc" data-d="2026-06-30"><div class="dn">30</div></div><div class="dc fade" data-d="2026-07-01"><div class="dn">1</div></div><div class="dc fade" data-d="2026-07-02"><div class="dn">2</div></div><div class="dc fade" data-d="2026-07-03"><div class="dn">3</div></div><div class="dc fade" data-d="2026-07-04"><div class="dn">4</div></div></div>
+    <div class="mood-area">
+      <div class="area-hd">오늘 기분</div>
+      <div class="mood-scroll" id="moodg">
+    <button class="mb" data-mi="0" title="신남">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#f4856a" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#f4856a" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#f4856a" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><circle cx="12.5" cy="16.5" r="1.5" fill="#f4856a"></circle><circle cx="19.5" cy="16.5" r="1.5" fill="#f4856a"></circle>
+     <path d="M11 22 Q16 26.5 21 22" stroke="#f4856a" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
+     <path d="M8 13 L11 15" stroke="#f4856a" stroke-width="1.2" opacity=".5"></path><path d="M24 13 L21 15" stroke="#f4856a" stroke-width="1.2" opacity=".5"></path><line x1="2" y1="18" x2="9" y2="17.5" stroke="#f4856a" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#f4856a" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#f4856a" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#f4856a" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#f4856a" opacity=".6"></ellipse><ellipse cx="9" cy="20" rx="3.5" ry="2" fill="#f4856a" opacity=".18"></ellipse>
+    <ellipse cx="23" cy="20" rx="3.5" ry="2" fill="#f4856a" opacity=".18"></ellipse></svg>
+      <span class="mb-lbl">신남</span>
+    </button>
+    <button class="mb" data-mi="1" title="행복">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#e8a020" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#e8a020" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#e8a020" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><circle cx="12.5" cy="17" r="1.5" fill="#e8a020"></circle><circle cx="19.5" cy="17" r="1.5" fill="#e8a020"></circle>
+     <path d="M11.5 22 Q16 25.5 20.5 22" stroke="#e8a020" stroke-width="1.8" fill="none" stroke-linecap="round"></path><line x1="2" y1="18" x2="9" y2="17.5" stroke="#e8a020" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#e8a020" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#e8a020" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#e8a020" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#e8a020" opacity=".6"></ellipse><ellipse cx="9" cy="20" rx="3.5" ry="2" fill="#e8a020" opacity=".18"></ellipse>
+    <ellipse cx="23" cy="20" rx="3.5" ry="2" fill="#e8a020" opacity=".18"></ellipse></svg>
+      <span class="mb-lbl">행복</span>
+    </button>
+    <button class="mb" data-mi="2" title="설렘">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#d4537e" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#d4537e" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#d4537e" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><circle cx="12.5" cy="16.5" r="1.5" fill="#d4537e"></circle><circle cx="19.5" cy="16.5" r="1.5" fill="#d4537e"></circle>
+     <path d="M11.5 22.5 Q16 25 20.5 22.5" stroke="#d4537e" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
+     <path d="M10 14 Q12 12 14 14" stroke="#d4537e" stroke-width="1.2" fill="none"></path>
+     <path d="M18 14 Q20 12 22 14" stroke="#d4537e" stroke-width="1.2" fill="none"></path><line x1="2" y1="18" x2="9" y2="17.5" stroke="#d4537e" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#d4537e" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#d4537e" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#d4537e" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#d4537e" opacity=".6"></ellipse><ellipse cx="9" cy="20" rx="3.5" ry="2" fill="#d4537e" opacity=".18"></ellipse>
+    <ellipse cx="23" cy="20" rx="3.5" ry="2" fill="#d4537e" opacity=".18"></ellipse></svg>
+      <span class="mb-lbl">설렘</span>
+    </button>
+    <button class="mb" data-mi="3" title="평온">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#7c6fe0" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#7c6fe0" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#7c6fe0" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><circle cx="12.5" cy="17.5" r="1.5" fill="#7c6fe0"></circle><circle cx="19.5" cy="17.5" r="1.5" fill="#7c6fe0"></circle>
+     <line x1="12" y1="23" x2="20" y2="23" stroke="#7c6fe0" stroke-width="1.5" stroke-linecap="round"></line><line x1="2" y1="18" x2="9" y2="17.5" stroke="#7c6fe0" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#7c6fe0" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#7c6fe0" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#7c6fe0" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#7c6fe0" opacity=".6"></ellipse></svg>
+      <span class="mb-lbl">평온</span>
+    </button>
+    <button class="mb" data-mi="4" title="보통">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#a8a3bb" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#a8a3bb" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#a8a3bb" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><circle cx="12.5" cy="17.5" r="1.5" fill="#a8a3bb"></circle><circle cx="19.5" cy="17.5" r="1.5" fill="#a8a3bb"></circle>
+     <path d="M12 23 Q16 24.5 20 23" stroke="#a8a3bb" stroke-width="1.5" fill="none" stroke-linecap="round"></path><line x1="2" y1="18" x2="9" y2="17.5" stroke="#a8a3bb" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#a8a3bb" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#a8a3bb" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#a8a3bb" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#a8a3bb" opacity=".6"></ellipse></svg>
+      <span class="mb-lbl">보통</span>
+    </button>
+    <button class="mb" data-mi="5" title="피곤">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#3dba8c" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#3dba8c" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#3dba8c" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><path d="M10 16 Q12.5 14 15 16" stroke="#3dba8c" stroke-width="1.5" fill="none"></path><path d="M17 16 Q19.5 14 22 16" stroke="#3dba8c" stroke-width="1.5" fill="none"></path>
+     <path d="M12.5 22.5 Q16 20.5 19.5 22.5" stroke="#3dba8c" stroke-width="1.5" fill="none" stroke-linecap="round"></path>
+     <path d="M6" y1="17" x2="9" y2="18.5" stroke="#3dba8c" stroke-width="1.2"></path><line x1="2" y1="18" x2="9" y2="17.5" stroke="#3dba8c" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#3dba8c" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#3dba8c" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#3dba8c" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#3dba8c" opacity=".6"></ellipse></svg>
+      <span class="mb-lbl">피곤</span>
+    </button>
+    <button class="mb" data-mi="6" title="우울">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#5a6fa8" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#5a6fa8" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#5a6fa8" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><path d="M11 16.5 Q12.5 14.5 14 16.5" stroke="#5a6fa8" stroke-width="1.5" fill="none"></path><path d="M18 16.5 Q19.5 14.5 21 16.5" stroke="#5a6fa8" stroke-width="1.5" fill="none"></path>
+     <path d="M12.5 23.5 Q16 21.5 19.5 23.5" stroke="#5a6fa8" stroke-width="1.5" fill="none" stroke-linecap="round"></path><line x1="2" y1="18" x2="9" y2="17.5" stroke="#5a6fa8" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#5a6fa8" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#5a6fa8" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#5a6fa8" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#5a6fa8" opacity=".6"></ellipse></svg>
+      <span class="mb-lbl">우울</span>
+    </button>
+    <button class="mb" data-mi="7" title="불안">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#8060c0" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#8060c0" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#8060c0" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><circle cx="12.5" cy="17" r="1.5" fill="#8060c0"></circle><circle cx="19.5" cy="17" r="1.5" fill="#8060c0"></circle>
+     <line x1="11.5" y1="23" x2="20.5" y2="23" stroke="#8060c0" stroke-width="1.5" stroke-linecap="round"></line>
+     <path d="M8 14 L11.5 16.5" stroke="#8060c0" stroke-width="1.5"></path><path d="M24 14 L20.5 16.5" stroke="#8060c0" stroke-width="1.5"></path><line x1="2" y1="18" x2="9" y2="17.5" stroke="#8060c0" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#8060c0" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#8060c0" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#8060c0" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#8060c0" opacity=".6"></ellipse></svg>
+      <span class="mb-lbl">불안</span>
+    </button>
+    <button class="mb" data-mi="8" title="화남">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#d03020" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#d03020" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#d03020" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><path d="M10 16 Q12 13.5 14 16" stroke="#d03020" stroke-width="1.5" fill="none"></path><path d="M18 16 Q20 13.5 22 16" stroke="#d03020" stroke-width="1.5" fill="none"></path>
+     <path d="M12.5 23.5 Q16 21 19.5 23.5" stroke="#d03020" stroke-width="1.5" fill="none" stroke-linecap="round"></path><line x1="2" y1="18" x2="9" y2="17.5" stroke="#d03020" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#d03020" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#d03020" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#d03020" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#d03020" opacity=".6"></ellipse></svg>
+      <span class="mb-lbl">화남</span>
+    </button>
+    <button class="mb" data-mi="9" title="졸림">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="#80a0d0" opacity=".8" transform="rotate(-15,7,8)"></ellipse>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"></ellipse>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="#80a0d0" opacity=".8" transform="rotate(15,25,8)"></ellipse>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"></ellipse><ellipse cx="16" cy="17" rx="11" ry="10" fill="#80a0d0" opacity=".18"></ellipse>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"></ellipse><ellipse cx="12.5" cy="17.5" rx="2" ry="2.5" fill="#80a0d0" opacity=".25"></ellipse><ellipse cx="19.5" cy="17.5" rx="2" ry="2.5" fill="#80a0d0" opacity=".25"></ellipse>
+     <circle cx="12.5" cy="17.5" r="1.3" fill="#80a0d0"></circle><circle cx="19.5" cy="17.5" r="1.3" fill="#80a0d0"></circle>
+     <line x1="12.5" y1="23" x2="19.5" y2="23" stroke="#80a0d0" stroke-width="1.5" stroke-linecap="round"></line><line x1="2" y1="18" x2="9" y2="17.5" stroke="#80a0d0" stroke-width=".9" opacity=".4"></line>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="#80a0d0" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="#80a0d0" stroke-width=".9" opacity=".4"></line>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="#80a0d0" stroke-width=".9" opacity=".4"></line><ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="#80a0d0" opacity=".6"></ellipse></svg>
+      <span class="mb-lbl">졸림</span>
+    </button></div>
+    </div>
+    <div class="stats">
+      <div class="st"><div class="sn">0</div><div class="sl">전체</div></div>
+      <div class="st"><div class="sn">0</div><div class="sl">완료</div></div>
+      <div class="st"><div class="sn">0%</div><div class="sl">달성</div></div>
+    </div>
+    <div class="prog-w">
+      <div class="pb-lbl">전체 달성률</div>
+      <div class="pb-bg"><div class="pb-fill" style="width:0%"></div></div>
+    </div></div>
+  <div class="right" id="rpanel">
+    <div class="rp-top">
+      <div>
+        <div class="dh">6월 11일 (목)</div>
+        <div class="ds">음력 27 · 0개</div>
+      </div>
+      <div class="top-r">
+        <div class="frow">
+          <button class="fb on" data-f="all">전체</button>
+          <button class="fb" data-f="active">진행</button>
+          <button class="fb" data-f="done">완료</button>
+        </div>
+        <button class="add-btn" id="btn-add">+ 추가</button>
+      </div>
+    </div>
+    <div class="list"><div class="empty"><svg viewBox="0 0 40 44" xmlns="http://www.w3.org/2000/svg"><ellipse cx="11" cy="13" rx="5" ry="6" fill="#7c6fe0" opacity=".85" transform="rotate(-15,11,13)"></ellipse>
+              <ellipse cx="12" cy="13" rx="2.5" ry="3.5" fill="#ede9ff" opacity=".9" transform="rotate(-15,12,13)"></ellipse>
+              <ellipse cx="29" cy="13" rx="5" ry="6" fill="#7c6fe0" opacity=".85" transform="rotate(15,29,13)"></ellipse>
+              <ellipse cx="28" cy="13" rx="2.5" ry="3.5" fill="#ede9ff" opacity=".9" transform="rotate(15,28,13)"></ellipse><ellipse cx="20" cy="26" rx="13" ry="11" fill="#ede9ff"></ellipse>
+             <ellipse cx="20" cy="26" rx="10" ry="8.5" fill="#7c6fe0" opacity=".18"></ellipse><ellipse cx="20" cy="21" rx="12" ry="11" fill="#7c6fe0" opacity=".22"></ellipse>
+              <ellipse cx="20" cy="22" rx="10.5" ry="9.5" fill="#ede9ff"></ellipse><path d="M16.5 26.5 Q20 28.5 23.5 26.5" stroke="#7c6fe0" stroke-width="1.5" fill="none" stroke-linecap="round"></path><circle cx="16" cy="21" r="1.5" fill="#7c6fe0"></circle>
+              <circle cx="24" cy="21" r="1.5" fill="#7c6fe0"></circle><ellipse cx="20" cy="24.5" rx="2" ry="1.3" fill="#7c6fe0" opacity=".7"></ellipse><line x1="5" y1="23" x2="14" y2="24" stroke="#7c6fe0" stroke-width="1" opacity=".4"></line>
+                  <line x1="5" y1="25.5" x2="14" y2="25.5" stroke="#7c6fe0" stroke-width="1" opacity=".4"></line>
+                  <line x1="26" y1="24" x2="35" y2="23" stroke="#7c6fe0" stroke-width="1" opacity=".4"></line>
+                  <line x1="26" y1="25.5" x2="35" y2="25.5" stroke="#7c6fe0" stroke-width="1" opacity=".4"></line><rect x="14" y="32" width="12" height="7" rx="3" fill="#7c6fe0" opacity=".25"></rect>
+           <line x1="17" y1="33.5" x2="17" y2="37.5" stroke="#7c6fe0" stroke-width="1" opacity=".5"></line>
+           <line x1="19" y1="33.5" x2="19" y2="37.5" stroke="#7c6fe0" stroke-width="1" opacity=".5"></line></svg><p>이 날 할 일이 없어요</p></div></div></div>
+</div>
+
+<script>
+const today=new Date(),todayStr=df(today);
+let cy=today.getFullYear(),cm=today.getMonth(),selD=new Date(today);
+let lunarOn=false,fmode='all',moods={},editId=null,modal=false,nextId=20;
+
+const CATS=[
+  {n:'업무',c:'#7c6fe0',bg:'#ede9ff'},
+  {n:'공부',c:'#3dba8c',bg:'#e3faf2'},
+  {n:'운동',c:'#f4856a',bg:'#fff0eb'},
+  {n:'생활',c:'#e09030',bg:'#fff8e5'},
+  {n:'기타',c:'#a8a3bb',bg:'#f3f0ff'},
+];
+const MOODS=[
+  {l:'신남',c:'#f4856a'},{l:'행복',c:'#e8a020'},{l:'설렘',c:'#d4537e'},
+  {l:'평온',c:'#7c6fe0'},{l:'보통',c:'#a8a3bb'},{l:'피곤',c:'#3dba8c'},
+  {l:'우울',c:'#5a6fa8'},{l:'불안',c:'#8060c0'},{l:'화남',c:'#d03020'},
+  {l:'졸림',c:'#80a0d0'},
+];
+const REPS=['없음','매일','매주','매월'];
+let todos=[
+  {id:1,title:'팀 주간 보고서',cat:0,pri:'high',time:'09:00',date:todayStr,done:false,rep:'매주',note:''},
+  {id:2,title:'헬스장 1시간',cat:2,pri:'mid',time:'07:00',date:todayStr,done:true,rep:'매일',note:''},
+  {id:3,title:'알고리즘 강의 1강',cat:1,pri:'mid',time:'20:00',date:todayStr,done:false,rep:'없음',note:''},
+  {id:4,title:'독서 30분',cat:4,pri:'low',time:'22:00',date:todayStr,done:false,rep:'매일',note:''},
+];
+
+function df(d){return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`}
+function p2(n){return String(n).padStart(2,'0')}
+function add(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r}
+function lunar(y,m,d){
+  const diff=Math.floor((new Date(y,m-1,d)-new Date(2000,0,6))/86400000);
+  const pos=((diff%29.530588853)+29.530588853)%29.530588853;
+  const ld=Math.floor(pos)+1;
+  const lm=['정','2','3','4','5','6','7','8','9','10','11','12'][(((Math.floor(diff/29.530588853)%12)+12)%12)];
+  return ld===1?lm+'월':String(ld);
+}
+
+/* ── CAT SVG (뭉뚱뭉뚱, 점눈) ── */
+function catSVG(col,bg,act){
+  // fat round body, tiny dot eyes, stubby ears, expression by act
+  const bod=`<ellipse cx="20" cy="26" rx="13" ry="11" fill="${bg}"/>
+             <ellipse cx="20" cy="26" rx="10" ry="8.5" fill="${col}" opacity=".18"/>`;
+  const ears=`<ellipse cx="11" cy="13" rx="5" ry="6" fill="${col}" opacity=".85" transform="rotate(-15,11,13)"/>
+              <ellipse cx="12" cy="13" rx="2.5" ry="3.5" fill="${bg}" opacity=".9" transform="rotate(-15,12,13)"/>
+              <ellipse cx="29" cy="13" rx="5" ry="6" fill="${col}" opacity=".85" transform="rotate(15,29,13)"/>
+              <ellipse cx="28" cy="13" rx="2.5" ry="3.5" fill="${bg}" opacity=".9" transform="rotate(15,28,13)"/>`;
+  const head=`<ellipse cx="20" cy="21" rx="12" ry="11" fill="${col}" opacity=".22"/>
+              <ellipse cx="20" cy="22" rx="10.5" ry="9.5" fill="${bg}"/>`;
+  const eyes=`<circle cx="16" cy="21" r="1.5" fill="${col}"/>
+              <circle cx="24" cy="21" r="1.5" fill="${col}"/>`;
+  const nose=`<ellipse cx="20" cy="24.5" rx="2" ry="1.3" fill="${col}" opacity=".7"/>`;
+  const whiskers=`<line x1="5" y1="23" x2="14" y2="24" stroke="${col}" stroke-width="1" opacity=".4"/>
+                  <line x1="5" y1="25.5" x2="14" y2="25.5" stroke="${col}" stroke-width="1" opacity=".4"/>
+                  <line x1="26" y1="24" x2="35" y2="23" stroke="${col}" stroke-width="1" opacity=".4"/>
+                  <line x1="26" y1="25.5" x2="35" y2="25.5" stroke="${col}" stroke-width="1" opacity=".4"/>`;
+  let face='',extra='';
+  if(act==='work'){
+    face=`<path d="M16.5 26.5 Q20 28.5 23.5 26.5" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+    extra=`<rect x="14" y="32" width="12" height="7" rx="3" fill="${col}" opacity=".25"/>
+           <line x1="17" y1="33.5" x2="17" y2="37.5" stroke="${col}" stroke-width="1" opacity=".5"/>
+           <line x1="19" y1="33.5" x2="19" y2="37.5" stroke="${col}" stroke-width="1" opacity=".5"/>`;
+  }
+  if(act==='study'){
+    face=`<path d="M17 26.5 Q20 28 23 26.5" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+    extra=`<rect x="13" y="32" width="14" height="9" rx="3" fill="${col}" opacity=".2"/>
+           <line x1="20" y1="32" x2="20" y2="41" stroke="${col}" stroke-width="1.2" opacity=".4"/>
+           <line x1="14" y1="35" x2="19" y2="35" stroke="${col}" stroke-width="1" opacity=".3"/>
+           <line x1="14" y1="37.5" x2="19" y2="37.5" stroke="${col}" stroke-width="1" opacity=".3"/>`;
+  }
+  if(act==='run'){
+    face=`<path d="M16.5 26 Q20 28.5 23.5 26" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+    extra=`<path d="M13 33 Q15 30 17 33 Q19 36 21 33 Q23 30 25 33" stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".5"/>
+           <circle cx="28" cy="30" r="2.5" fill="${col}" opacity=".2"/>`;
+  }
+  if(act==='home'){
+    face=`<path d="M17 26.5 Q20 28.5 23 26.5" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+    extra=`<path d="M14 39 L20 33 L26 39 L26 43 L14 43 Z" fill="${col}" opacity=".2"/>
+           <rect x="18" y="39" width="4" height="4" rx="1" fill="${col}" opacity=".3"/>`;
+  }
+  if(act==='paw'){
+    face=`<path d="M17 26.5 Q20 28 23 26.5" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+    extra=`<ellipse cx="20" cy="37" rx="4.5" ry="3.5" fill="${col}" opacity=".25"/>
+           <circle cx="14" cy="35" r="2" fill="${col}" opacity=".2"/>
+           <circle cx="26" cy="35" r="2" fill="${col}" opacity=".2"/>
+           <circle cx="17" cy="33" r="1.5" fill="${col}" opacity=".2"/>
+           <circle cx="23" cy="33" r="1.5" fill="${col}" opacity=".2"/>`;
+  }
+  return`<svg viewBox="0 0 40 44" xmlns="http://www.w3.org/2000/svg">${ears}${bod}${head}${face}${eyes}${nose}${whiskers}${extra}</svg>`;
+}
+
+/* ── MOOD CAT SVG ── */
+function moodCat(col,idx){
+  const head=`<ellipse cx="16" cy="17" rx="11" ry="10" fill="${col}" opacity=".18"/>
+              <ellipse cx="16" cy="18" rx="9.5" ry="8.5" fill="white"/>`;
+  const ears=[
+    `<ellipse cx="7" cy="8" rx="4.5" ry="5.5" fill="${col}" opacity=".8" transform="rotate(-15,7,8)"/>
+     <ellipse cx="7.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(-15,7.5,8)"/>
+     <ellipse cx="25" cy="8" rx="4.5" ry="5.5" fill="${col}" opacity=".8" transform="rotate(15,25,8)"/>
+     <ellipse cx="24.5" cy="8" rx="2" ry="3" fill="white" opacity=".9" transform="rotate(15,24.5,8)"/>`,
+  ][0];
+  const w=`<line x1="2" y1="18" x2="9" y2="17.5" stroke="${col}" stroke-width=".9" opacity=".4"/>
+            <line x1="2" y1="20.5" x2="9" y2="20" stroke="${col}" stroke-width=".9" opacity=".4"/>
+            <line x1="23" y1="17.5" x2="30" y2="18" stroke="${col}" stroke-width=".9" opacity=".4"/>
+            <line x1="23" y1="20" x2="30" y2="20.5" stroke="${col}" stroke-width=".9" opacity=".4"/>`;
+  const nose=`<ellipse cx="16" cy="20.5" rx="1.8" ry="1.2" fill="${col}" opacity=".6"/>`;
+  const blush=idx===0||idx===1||idx===2?`<ellipse cx="9" cy="20" rx="3.5" ry="2" fill="${col}" opacity=".18"/>
+    <ellipse cx="23" cy="20" rx="3.5" ry="2" fill="${col}" opacity=".18"/>`:''
+  const expressions=[
+    `<circle cx="12.5" cy="16.5" r="1.5" fill="${col}"/><circle cx="19.5" cy="16.5" r="1.5" fill="${col}"/>
+     <path d="M11 22 Q16 26.5 21 22" stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+     <path d="M8 13 L11 15" stroke="${col}" stroke-width="1.2" opacity=".5"/><path d="M24 13 L21 15" stroke="${col}" stroke-width="1.2" opacity=".5"/>`,
+    `<circle cx="12.5" cy="17" r="1.5" fill="${col}"/><circle cx="19.5" cy="17" r="1.5" fill="${col}"/>
+     <path d="M11.5 22 Q16 25.5 20.5 22" stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`,
+    `<circle cx="12.5" cy="16.5" r="1.5" fill="${col}"/><circle cx="19.5" cy="16.5" r="1.5" fill="${col}"/>
+     <path d="M11.5 22.5 Q16 25 20.5 22.5" stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+     <path d="M10 14 Q12 12 14 14" stroke="${col}" stroke-width="1.2" fill="none"/>
+     <path d="M18 14 Q20 12 22 14" stroke="${col}" stroke-width="1.2" fill="none"/>`,
+    `<circle cx="12.5" cy="17.5" r="1.5" fill="${col}"/><circle cx="19.5" cy="17.5" r="1.5" fill="${col}"/>
+     <line x1="12" y1="23" x2="20" y2="23" stroke="${col}" stroke-width="1.5" stroke-linecap="round"/>`,
+    `<circle cx="12.5" cy="17.5" r="1.5" fill="${col}"/><circle cx="19.5" cy="17.5" r="1.5" fill="${col}"/>
+     <path d="M12 23 Q16 24.5 20 23" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`,
+    `<path d="M10 16 Q12.5 14 15 16" stroke="${col}" stroke-width="1.5" fill="none"/><path d="M17 16 Q19.5 14 22 16" stroke="${col}" stroke-width="1.5" fill="none"/>
+     <path d="M12.5 22.5 Q16 20.5 19.5 22.5" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+     <path d="M6" y1="17" x2="9" y2="18.5" stroke="${col}" stroke-width="1.2"/>`,
+    `<path d="M11 16.5 Q12.5 14.5 14 16.5" stroke="${col}" stroke-width="1.5" fill="none"/><path d="M18 16.5 Q19.5 14.5 21 16.5" stroke="${col}" stroke-width="1.5" fill="none"/>
+     <path d="M12.5 23.5 Q16 21.5 19.5 23.5" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`,
+    `<circle cx="12.5" cy="17" r="1.5" fill="${col}"/><circle cx="19.5" cy="17" r="1.5" fill="${col}"/>
+     <line x1="11.5" y1="23" x2="20.5" y2="23" stroke="${col}" stroke-width="1.5" stroke-linecap="round"/>
+     <path d="M8 14 L11.5 16.5" stroke="${col}" stroke-width="1.5"/><path d="M24 14 L20.5 16.5" stroke="${col}" stroke-width="1.5"/>`,
+    `<path d="M10 16 Q12 13.5 14 16" stroke="${col}" stroke-width="1.5" fill="none"/><path d="M18 16 Q20 13.5 22 16" stroke="${col}" stroke-width="1.5" fill="none"/>
+     <path d="M12.5 23.5 Q16 21 19.5 23.5" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`,
+    `<ellipse cx="12.5" cy="17.5" rx="2" ry="2.5" fill="${col}" opacity=".25"/><ellipse cx="19.5" cy="17.5" rx="2" ry="2.5" fill="${col}" opacity=".25"/>
+     <circle cx="12.5" cy="17.5" r="1.3" fill="${col}"/><circle cx="19.5" cy="17.5" r="1.3" fill="${col}"/>
+     <line x1="12.5" y1="23" x2="19.5" y2="23" stroke="${col}" stroke-width="1.5" stroke-linecap="round"/>`,
+  ];
+  return`<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">${ears}${head}${expressions[idx]||expressions[4]}${w}${nose}${blush}</svg>`;
+}
+
+const CAT_ACTS=['work','study','run','home','paw'];
+
+function render(){renderL();renderR();}
+
+function renderL(){
+  const lp=document.getElementById('lpanel');
+  const ds=df(selD);
+  const first=new Date(cy,cm,1),lastDay=new Date(cy,cm+1,0).getDate(),sdow=first.getDay();
+  let cells='';
+  for(let i=0;i<sdow;i++) cells+=dcell(new Date(cy,cm,1-sdow+i),true);
+  for(let d=1;d<=lastDay;d++) cells+=dcell(new Date(cy,cm,d),false);
+  const rem=(7-((sdow+lastDay)%7))%7;
+  for(let i=1;i<=rem;i++) cells+=dcell(new Date(cy,cm+1,i),true);
+
+  const mi=moods[todayStr];
+  const moodHTML=MOODS.map((m,i)=>`
+    <button class="mb${mi===i?' on':''}" data-mi="${i}" title="${m.l}">
+      ${moodCat(m.c,i)}
+      <span class="mb-lbl">${m.l}</span>
+    </button>`).join('');
+
+  const total=todos.length,done=todos.filter(t=>t.done).length;
+  const rate=total?Math.round(done/total*100):0;
+
+  lp.innerHTML=`
+    <div class="cal-hd">
+      <div class="cal-nav">
+        <button class="cnb" id="pm">&#8249;</button>
+        <button class="cnb" id="nm">&#8250;</button>
+        <span class="cal-title" style="margin-left:4px">${cy}년 ${cm+1}월</span>
+      </div>
+      <div class="ltog">
+        <button class="ltb${!lunarOn?' on':''}" id="sol">양력</button>
+        <button class="ltb${lunarOn?' on':''}" id="lun">음력</button>
+      </div>
+    </div>
+    <div class="dow"><span style="color:var(--coral)">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:var(--p)">토</span></div>
+    <div class="dg" id="dg">${cells}</div>
+    <div class="mood-area">
+      <div class="area-hd">오늘 기분</div>
+      <div class="mood-scroll" id="moodg">${moodHTML}</div>
+    </div>
+    <div class="stats">
+      <div class="st"><div class="sn">${total}</div><div class="sl">전체</div></div>
+      <div class="st"><div class="sn">${done}</div><div class="sl">완료</div></div>
+      <div class="st"><div class="sn">${rate}%</div><div class="sl">달성</div></div>
+    </div>
+    <div class="prog-w">
+      <div class="pb-lbl">전체 달성률</div>
+      <div class="pb-bg"><div class="pb-fill" style="width:${rate}%"></div></div>
+    </div>`;
+
+  document.getElementById('pm').onclick=()=>{if(cm===0){cm=11;cy--;}else cm--;renderL();};
+  document.getElementById('nm').onclick=()=>{if(cm===11){cm=0;cy++;}else cm++;renderL();};
+  document.getElementById('sol').onclick=()=>{lunarOn=false;renderL();};
+  document.getElementById('lun').onclick=()=>{lunarOn=true;renderL();};
+  document.getElementById('dg').onclick=e=>{const dc=e.target.closest('.dc');if(dc){selD=new Date(dc.dataset.d+'T00:00:00');renderL();renderR();}};
+  document.getElementById('moodg').onclick=e=>{const b=e.target.closest('.mb');if(b){moods[todayStr]=+b.dataset.mi;renderL();}};
+}
+
+function dcell(d,fade){
+  const ds=df(d),dow=d.getDay();
+  const isT=ds===todayStr,isSel=ds===df(selD),sun=dow===0;
+  const dots=todos.filter(t=>t.date===ds).slice(0,3).map(t=>`<div class="dot" style="background:${CATS[t.cat].c}"></div>`).join('');
+  const cls=['dc',fade?'fade':'',isT?'tod':'',isSel&&!isT?'sel':'',sun?'sun':''].filter(Boolean).join(' ');
+  const lun=lunarOn?`<div class="lun">${lunar(d.getFullYear(),d.getMonth()+1,d.getDate())}</div>`:'';
+  return`<div class="${cls}" data-d="${ds}"><div class="dn">${d.getDate()}</div>${lun}${dots?`<div class="dotrow">${dots}</div>`:''}</div>`;
+}
+
+function renderR(){
+  const rp=document.getElementById('rpanel');
+  if(modal){rp.innerHTML=buildModal();bindModal();return;}
+  const ds=df(selD),wd=['일','월','화','수','목','금','토'][selD.getDay()];
+  const lstr=lunar(selD.getFullYear(),selD.getMonth()+1,selD.getDate());
+  let items=todos.filter(t=>t.date===ds);
+  if(fmode==='active')items=items.filter(t=>!t.done);
+  if(fmode==='done')items=items.filter(t=>t.done);
+  const now=`${p2(today.getHours())}:${p2(today.getMinutes())}`;
+  const late=items.filter(t=>!t.done&&t.time&&t.time<now);
+  const up=items.filter(t=>!t.done&&(!t.time||t.time>=now));
+  const dn=items.filter(t=>t.done);
+  let lhtml='';
+  const grp=(lbl,arr)=>{if(!arr.length)return;lhtml+=`<div class="slbl">${lbl}</div>`;arr.forEach(t=>{lhtml+=tcard(t);});};
+  if(fmode!=='done'){grp('지연됨',late);grp('예정',up);}
+  if(fmode!=='active')grp('완료',dn);
+  if(!items.length)lhtml=`<div class="empty">${catSVG(CATS[0].c,CATS[0].bg,'work').replace('width:40px;height:40px','width:60px;height:60px')}<p>이 날 할 일이 없어요</p></div>`;
+
+  rp.innerHTML=`
+    <div class="rp-top">
+      <div>
+        <div class="dh">${selD.getMonth()+1}월 ${selD.getDate()}일 (${wd})</div>
+        <div class="ds">음력 ${lstr} · ${todos.filter(t=>t.date===ds).length}개</div>
+      </div>
+      <div class="top-r">
+        <div class="frow">
+          <button class="fb${fmode==='all'?' on':''}" data-f="all">전체</button>
+          <button class="fb${fmode==='active'?' on':''}" data-f="active">진행</button>
+          <button class="fb${fmode==='done'?' on':''}" data-f="done">완료</button>
+        </div>
+        <button class="add-btn" id="btn-add">+ 추가</button>
+      </div>
+    </div>
+    <div class="list">${lhtml}</div>`;
+
+  document.querySelectorAll('.fb').forEach(b=>b.onclick=()=>{fmode=b.dataset.f;renderR();});
+  document.getElementById('btn-add').onclick=()=>{editId=null;modal=true;renderR();};
+  document.querySelectorAll('.chk').forEach(el=>el.onclick=e=>{e.stopPropagation();const t=todos.find(x=>x.id===+el.dataset.id);if(t)t.done=!t.done;render();});
+  document.querySelectorAll('.btn-edit').forEach(el=>el.onclick=e=>{e.stopPropagation();editId=+el.dataset.id;modal=true;renderR();});
+  document.querySelectorAll('.btn-del').forEach(el=>el.onclick=e=>{e.stopPropagation();todos=todos.filter(x=>x.id!==+el.dataset.id);render();});
+}
+
+function tcard(t){
+  const cat=CATS[t.cat],pl={high:'높음',mid:'중간',low:'낮음'};
+  return`<div class="tc${t.done?' donec':''}">
+    <div class="tc-icon" style="background:${cat.bg}">${catSVG(cat.c,cat.bg,CAT_ACTS[t.cat])}</div>
+    <div class="tc-body">
+      <div class="tc-title">${t.title}</div>
+      <div class="tc-meta">
+        <span class="bc" style="background:${cat.bg};color:${cat.c}">${cat.n}</span>
+        <span class="badge b${t.pri[0]}">${pl[t.pri]}</span>
+        ${t.rep!=='없음'?`<span class="badge br">${t.rep}</span>`:''}
+        ${t.time?`<span class="tc-time">&#128336; ${t.time}</span>`:''}
+      </div>
+    </div>
+    <div class="tc-r">
+      <div class="chk${t.done?' on':''}" data-id="${t.id}">${t.done?'<svg viewBox="0 0 12 12" width="12" height="12"><polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+      <div class="act-row">
+        <button class="abt btn-edit" data-id="${t.id}">&#9998; 수정</button>
+        <button class="abt del btn-del" data-id="${t.id}">&#128465; 삭제</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildModal(){
+  const t=editId?todos.find(x=>x.id===editId):null;
+  const v=(k,d)=>t?t[k]:d;
+  const cph=CATS.map((c,i)=>`
+    <button class="cp${v('cat',0)===i?' on':''}" data-ci="${i}" type="button">
+      ${catSVG(c.c,c.bg,CAT_ACTS[i])}
+      <span class="cp-lbl">${c.n}</span>
+    </button>`).join('');
+  const rph=REPS.map(r=>`<button class="rs${v('rep','없음')===r?' on':''}" data-rv="${r}" type="button">${r}</button>`).join('');
+  return`<div class="ov"><div class="modal">
+    <div class="mhd">${moodCat(v('cat',0)<5?CATS[v('cat',0)].c:'#7c6fe0',0).replace('width:34px;height:34px','').replace('<svg ','<svg width="22" height="22" ')}${editId?'할 일 수정':'새 할 일'}</div>
+    <div class="field"><label>제목</label><input id="ft" value="${v('title','')}" placeholder="할 일 입력..."/></div>
+    <div class="field"><label>카테고리</label><div class="cat-pick" id="cpick">${cph}</div></div>
+    <div class="twocol">
+      <div class="field"><label>날짜</label><input type="date" id="fd" value="${v('date',df(selD))}"/></div>
+      <div class="field"><label>시간</label><input type="time" id="ftm" value="${v('time','')}"/></div>
+    </div>
+    <div class="field"><label>우선순위</label>
+      <select id="fp"><option value="high"${v('pri','mid')==='high'?' selected':''}>높음</option><option value="mid"${v('pri','mid')==='mid'?' selected':''}>중간</option><option value="low"${v('pri','mid')==='low'?' selected':''}>낮음</option></select>
+    </div>
+    <div class="field"><label>반복</label><div class="repset" id="rset">${rph}</div></div>
+    <div class="field"><label>메모</label><textarea id="fn">${v('note','')}</textarea></div>
+    <div class="mftr"><button class="btn-c" id="mc">취소</button><button class="btn-s" id="ms">${editId?'저장':'추가'}</button></div>
+  </div></div>`;
+}
+
+function bindModal(){
+  let sc=editId?todos.find(x=>x.id===editId).cat:0;
+  let sr=editId?todos.find(x=>x.id===editId).rep:'없음';
+  document.querySelectorAll('.cp').forEach(b=>b.onclick=()=>{sc=+b.dataset.ci;document.querySelectorAll('.cp').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
+  document.querySelectorAll('.rs').forEach(b=>b.onclick=()=>{sr=b.dataset.rv;document.querySelectorAll('.rs').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
+  document.getElementById('mc').onclick=()=>{modal=false;renderR();};
+  document.getElementById('ms').onclick=()=>{
+    const title=document.getElementById('ft').value.trim();
+    if(!title)return;
+    const d={title,cat:sc,pri:document.getElementById('fp').value,time:document.getElementById('ftm').value,date:document.getElementById('fd').value,done:false,rep:sr,note:document.getElementById('fn').value};
+    if(editId)Object.assign(todos.find(x=>x.id===editId),d);
+    else todos.push({id:nextId++,...d});
+    modal=false;render();
+  };
+}
+
+render();
+
+function saveTodos() {
+    localStorage.setItem('nyanodo_todos', JSON.stringify(todos));
+}
+// Wrap original render
+const originalRender = render;
+render = function() {
+    originalRender();
+    saveTodos();
+};
+</script>
+</body></html>
