@@ -25,9 +25,10 @@ body{transition:background .6s}
 header{
   display:flex;align-items:center;gap:0;
   background:var(--ink);border-radius:18px;
-  padding:0 20px 0 24px;height:56px;
+  padding:10px 16px;
   box-shadow:0 4px 20px rgba(26,22,36,.18);
   position:relative;overflow:hidden;
+  flex-wrap:wrap;gap:8px;
 }
 header::before{
   content:'';position:absolute;inset:0;
@@ -35,24 +36,22 @@ header::before{
   pointer-events:none;
 }
 .h-title{
-  font-family:'Caveat',cursive;font-size:28px;font-weight:700;
-  color:#fff;letter-spacing:-.5px;flex:1;
+  font-family:'Caveat',cursive;font-size:26px;font-weight:700;
+  color:#fff;letter-spacing:-.5px;flex:1;min-width:100px;
 }
-.h-right{display:flex;align-items:center;gap:10px}
+.h-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
 /* 기분 뱃지 (헤더 우측) */
 .mood-badge{
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:6px;
   background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.18);
-  border-radius:var(--rp);padding:5px 14px 5px 8px;cursor:pointer;
-  transition:background .2s,border-color .2s;position:relative;
+  border-radius:var(--rp);padding:5px 10px 5px 6px;
+  transition:background .2s;flex-shrink:0;
 }
-.mood-badge:hover{background:rgba(255,255,255,.18)}
-.mood-badge-svg{width:36px;height:36px;flex-shrink:0}
+.mood-badge-svg{width:30px;height:30px;flex-shrink:0}
 .mood-badge-info{display:flex;flex-direction:column;line-height:1.2}
-.mood-badge-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.6)}
-.mood-badge-name{font-size:13px;font-weight:700;color:#fff}
-.mood-badge-none{font-size:12px;color:rgba(255,255,255,.5);font-weight:500}
+.mood-badge-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.6)}
+.mood-badge-name{font-size:12px;font-weight:700;color:#fff}
 
 /* 기분 선택 드롭다운 */
 .mood-dropdown{
@@ -73,15 +72,15 @@ header::before{
 
 /* 날씨 뱃지 */
 .wx-badge{
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:6px;
   background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.18);
-  border-radius:var(--rp);padding:6px 14px;cursor:pointer;
-  transition:background .2s;
+  border-radius:var(--rp);padding:6px 12px;cursor:pointer;
+  transition:background .2s;flex-shrink:0;
 }
 .wx-badge:hover{background:rgba(255,255,255,.18)}
-.wx-icon{font-size:20px;line-height:1}
-.wx-temp{font-size:15px;font-weight:700;color:#fff}
-.wx-desc{font-size:10px;color:rgba(255,255,255,.6);font-weight:500;white-space:nowrap}
+.wx-icon{font-size:18px;line-height:1}
+.wx-temp{font-size:14px;font-weight:700;color:#fff}
+.wx-desc{font-size:10px;color:rgba(255,255,255,.6);font-weight:500;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ── 날씨 패널 ── */
 .wx-panel{background:var(--card);border-radius:16px;border:1.5px solid var(--ink5);box-shadow:0 4px 20px rgba(0,0,0,.07);display:none;overflow:hidden}
@@ -112,13 +111,18 @@ header::before{
 .wx-loading{text-align:center;padding:24px;color:var(--ink3);font-size:13px}
 .wx-err{background:#fff0eb;border:1.5px solid var(--acc);border-radius:10px;padding:10px 12px;font-size:12px;font-weight:600;color:var(--acc2);margin-bottom:8px}
 
-/* ── BODY GRID ── */
-.body{display:grid;grid-template-columns:286px 1fr;gap:10px;flex:1}
+/* ── BODY: 세로 단일 컬럼 스크롤 ── */
+.body{display:flex;flex-direction:column;gap:10px}
 
-/* ── LEFT PANEL ── */
+/* 데스크탑에서만 2컬럼 */
+@media(min-width:900px){
+  .body{display:grid;grid-template-columns:300px 1fr;gap:10px}
+}
+
 .left{background:var(--card);border-radius:16px;border:1.5px solid var(--ink5);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 12px rgba(26,22,36,.05)}
 
-/* CAL */
+/* 모바일에서 right 패널 min-height */
+.right{display:flex;flex-direction:column;background:var(--card);border-radius:16px;border:1.5px solid var(--ink5);overflow:hidden;box-shadow:0 2px 12px rgba(26,22,36,.05);min-height:500px}
 .cal-hd{padding:12px 14px 6px;display:flex;align-items:center;justify-content:space-between}
 .cal-title{font-size:14px;font-weight:700;color:var(--ink)}
 .cal-nav{display:flex;gap:4px;align-items:center}
@@ -594,8 +598,8 @@ function renderL(){
   const rate=total?Math.round(done/total*100):0;
   const mi=moods[df(selD)];
   const moodHTML=MOODS.map((m,i)=>`
-    <button onclick="selectMood(${i})" class="mb${mi===i?' on':''}" style="cursor:pointer;border:2px solid ${mi===i?m.c:'#ddd'};border-radius:10px;background:${mi===i?m.p3:'#f9f9f9'};padding:5px 3px;display:flex;flex-direction:column;align-items:center;gap:2px;width:46px">
-      <div style="pointer-events:none">${moodBottleSVG(m.c,i,mi===i,30)}</div>
+    <button onclick="selectMood(${i})" class="mb${mi===i?' on':''}" style="cursor:pointer;border:2px solid ${mi===i?m.c:'#ddd'};border-radius:10px;background:${mi===i?m.p3:'#f9f9f9'};padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;width:100%">
+      <div style="pointer-events:none">${moodBottleSVG(m.c,i,mi===i,28)}</div>
       <span style="pointer-events:none;font-size:9px;font-weight:700;color:${mi===i?m.p:'#999'}">${m.l}</span>
     </button>`).join('');
 
@@ -615,7 +619,7 @@ function renderL(){
     <div class="dg" id="dg">${cells}</div>
     <div style="padding:8px 10px;border-top:1.5px solid var(--ink5)">
       <div style="font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">오늘 기분</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px">${moodHTML}</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px">${moodHTML}</div>
     </div>
     <div class="stats-row">
       <div class="st"><div class="sn">${total}</div><div class="sl">전체</div></div>
