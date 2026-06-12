@@ -594,7 +594,9 @@ function renderL(){
   for(let d=1;d<=lastDay;d++) cells+=dcell(new Date(cy,cm,d),false);
   const rem=(7-((sdow+lastDay)%7))%7;
   for(let i=1;i<=rem;i++) cells+=dcell(new Date(cy,cm+1,i),true);
-  const total=todos.length,done=todos.filter(t=>t.done).length;
+  const ds0=df(selD);
+  const dayTodos=todos.filter(t=>t.date===ds0);
+  const total=dayTodos.length,done=dayTodos.filter(t=>t.done).length;
   const rate=total?Math.round(done/total*100):0;
   const mi=moods[df(selD)];
   const moodHTML=MOODS.map((m,i)=>`
