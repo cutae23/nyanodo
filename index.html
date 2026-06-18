@@ -277,8 +277,23 @@ header::before{
 .alarm-status.ok{color:#1a7a50}
 .alarm-status.warn{color:#c03010}
 .alarm-status.info{color:var(--ink3)}
+.alarm-test-btn{margin-top:6px;padding:6px 12px;border:1.5px solid var(--acc);border-radius:20px;background:transparent;color:var(--acc);font-size:11px;font-weight:700;cursor:pointer}
+.alarm-test-btn:active{background:var(--acc3)}
 .tc-period{font-size:11px;font-weight:600;color:var(--ink3)}
 .tc-alarm{font-size:11px}
+
+/* 인앱 알람 배너 — 브라우저 알림과 별개로 화면 안에서도 눈에 띄게 표시 */
+#alarm-banner{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-30px);width:min(92vw,420px);
+  background:linear-gradient(135deg,#ff6b35,#ff8c5a);color:#fff;border-radius:16px;padding:14px 16px;
+  display:flex;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(255,107,53,.45);
+  opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:9999;cursor:default}
+#alarm-banner.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#alarm-banner .ab-icon{font-size:28px;flex-shrink:0;animation:abring 1s ease-in-out infinite}
+#alarm-banner .ab-text{flex:1;min-width:0}
+#alarm-banner .ab-title{font-weight:800;font-size:14px;margin-bottom:2px}
+#alarm-banner .ab-body{font-size:12.5px;opacity:.95;word-break:break-word}
+#alarm-banner .ab-close{background:rgba(255,255,255,.25);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:13px;cursor:pointer;flex-shrink:0}
+@keyframes abring{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}
 
 /* 기분별 테마 전환 */
 body,header,.left,.right,.wx-panel{transition:background .5s,border-color .4s}
@@ -420,10 +435,25 @@ function scheduleAlarm(t){
 }
 function fireNotif(title,body){
   if('Notification' in window && Notification.permission==='granted'){
-    try{new Notification(title,{body,icon:'',tag:title+body});}catch(e){}
+    try{
+      const n=new Notification(title,{body,tag:'alarm-'+Date.now()});
+      n.onclick=()=>{try{window.focus();}catch(e){}};
+    }catch(e){}
   }
-  // 진동(모바일, 지원 시)
-  if(navigator.vibrate) navigator.vibrate([120,60,120]);
+  if(navigator.vibrate) navigator.vibrate([200,100,200,100,200]);
+  showInAppAlarmBanner(title,body);
+}
+function showInAppAlarmBanner(title,body){
+  const old=document.getElementById('alarm-banner');
+  if(old) old.remove();
+  const b=document.createElement('div');
+  b.id='alarm-banner';
+  b.innerHTML=`<div class="ab-icon">⏰</div><div class="ab-text"><div class="ab-title">${title}</div><div class="ab-body">${body}</div></div><button class="ab-close" aria-label="닫기">✕</button>`;
+  document.body.appendChild(b);
+  requestAnimationFrame(()=>b.classList.add('show'));
+  const close=()=>{b.classList.remove('show');setTimeout(()=>b.remove(),300);};
+  b.querySelector('.ab-close').onclick=close;
+  setTimeout(close,15000);
 }
 function checkAlarms(){
   const now=new Date();
@@ -438,15 +468,19 @@ function checkAlarms(){
     const targetMin=hh*60+mm;
     const diff=targetMin-nowMin;
     const key=t.id+'_'+nowStr;
-    if(diff===30 && !notifiedKeys[key]){
-      fireNotif('⏰ 30분 후 할 일',`${t.title} · ${t.time}`);
+    // 정확히 30분 전 그 분(minute)만 잡는 대신, 30분 전부터 할 일 시각까지의 구간에서
+    // 한 번이라도 체크가 돌면 알림이 가도록 범위로 체크 (탭이 백그라운드라 타이머가
+    // 정확히 1분마다 안 돌아도 알림을 놓치지 않게 함)
+    if(diff<=30 && diff>=0 && !notifiedKeys[key]){
+      fireNotif('⏰ 할 일 알림',`${t.title} · ${t.time}${diff>0?` (${diff}분 전)`:' (지금)'}`);
       notifiedKeys[key]=true;
       safeStorage.setItem('nyanodo_notified',JSON.stringify(notifiedKeys));
     }
   });
 }
-setInterval(checkAlarms,60000);
+setInterval(checkAlarms,20000);
 checkAlarms();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkAlarms();});
 if(todos.some(t=>t.alarm)) requestNotifPermission();
 
 function df(d){return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`}
@@ -945,6 +979,7 @@ function buildModal(){
       <div class="field"><label>알림</label>
         <label class="chkrow"><input type="checkbox" id="falarm"${v('alarm',false)?' checked':''}/> 30분 전 알림</label>
         <div class="alarm-status" id="alarm-status"></div>
+        <button type="button" class="alarm-test-btn" id="alarm-test-btn">🔔 알림 테스트</button>
       </div>
     </div>
     <div class="field"><label>우선순위</label>
@@ -989,6 +1024,10 @@ function bindModal(){
       else refreshAlarmStatus();
     };
   }
+  const testBtn=document.getElementById('alarm-test-btn');
+  if(testBtn) testBtn.onclick=()=>{
+    fireNotif('⏰ 테스트 알림',`알림이 정상적으로 동작하고 있어요!`);
+  };
   document.getElementById('mc').onclick=()=>{modal=false;renderR();};
   document.getElementById('ms').onclick=()=>{
     const titleInput=document.getElementById('ft');
@@ -1007,6 +1046,10 @@ function bindModal(){
     let todoObj;
     if(editId){todoObj=todos.find(x=>x.id===editId);Object.assign(todoObj,d);}
     else{todoObj={id:nextId++,...d};todos.push(todoObj);}
+    // 시간/알림을 다시 설정했을 수 있으니, 오늘 날짜에 대한 '이미 알렸음' 기록을 지워서
+    // 같은 날 다시 테스트하거나 시간을 바꿔도 알림이 정상적으로 다시 동작하게 함
+    const todayKey=todoObj.id+'_'+df(new Date());
+    if(notifiedKeys[todayKey]){delete notifiedKeys[todayKey];safeStorage.setItem('nyanodo_notified',JSON.stringify(notifiedKeys));}
     scheduleAlarm(todoObj);
     modal=false;render();
   };
